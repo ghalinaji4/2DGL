@@ -1,60 +1,69 @@
-#ifndef LIBGL_H
-#define LIBGL_H
+#ifndef D2DGL_H
+#define D2DGL_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef struct LibGL_Context LibGL_Context;
+typedef struct D2DGL_Context D2DGL_Context;
+
+typedef struct {
+    int w;
+    int h;
+    uint32_t *pixels; // 0xAARRGGBB; alpha == 0 is transparent
+} D2DGL_Sprite;
 
 enum {
-    LIBGL_KEY_W = 0,
-    LIBGL_KEY_A,
-    LIBGL_KEY_S,
-    LIBGL_KEY_D,
-    LIBGL_KEY_E,
-    LIBGL_KEY_UP,
-    LIBGL_KEY_DOWN,
-    LIBGL_KEY_LEFT,
-    LIBGL_KEY_RIGHT,
-    LIBGL_KEY_SPACE,
-    LIBGL_KEY_ESC,
-    LIBGL_KEY_F5,
-    LIBGL_KEY_F9,
-    LIBGL_KEY_COUNT
+    D2DGL_KEY_ESC = 0,
+    D2DGL_KEY_SPACE,
+    D2DGL_KEY_W,
+    D2DGL_KEY_A,
+    D2DGL_KEY_S,
+    D2DGL_KEY_D,
+    D2DGL_KEY_E,
+    D2DGL_KEY_H,
+    D2DGL_KEY_UP,
+    D2DGL_KEY_DOWN,
+    D2DGL_KEY_LEFT,
+    D2DGL_KEY_RIGHT,
+    D2DGL_KEY_F5,
+    D2DGL_KEY_F9,
+    D2DGL_KEY_COUNT
 };
 
-LibGL_Context *libgl_create(int width, int height, const char *title);
-void libgl_destroy(LibGL_Context *ctx);
+D2DGL_Context *d2dgl_create(int width, int height, const char *title);
+void d2dgl_destroy(D2DGL_Context *ctx);
 
-bool libgl_poll_events(LibGL_Context *ctx);
-float libgl_delta_time(LibGL_Context *ctx);
+bool d2dgl_poll_events(D2DGL_Context *ctx);
+float d2dgl_delta_time(const D2DGL_Context *ctx);
+void d2dgl_present(D2DGL_Context *ctx);
 
-bool libgl_key_down(const LibGL_Context *ctx, int key);
-bool libgl_key_pressed(const LibGL_Context *ctx, int key);
-bool libgl_mouse_down(const LibGL_Context *ctx);
-void libgl_mouse_pos(const LibGL_Context *ctx, int *out_x, int *out_y);
+void d2dgl_clear(D2DGL_Context *ctx, uint32_t argb);
+void d2dgl_put_pixel(D2DGL_Context *ctx, int x, int y, uint32_t argb);
+void d2dgl_fill_rect(D2DGL_Context *ctx, int x, int y, int w, int h, uint32_t argb);
+void d2dgl_fill_circle(D2DGL_Context *ctx, int cx, int cy, int radius, uint32_t argb);
+void d2dgl_draw_ring(D2DGL_Context *ctx, int cx, int cy, int outerRadius, int innerRadius, uint32_t argb);
+void d2dgl_fill_rotated_rect(D2DGL_Context *ctx, float cx, float cy, float w, float h, float angleDeg, uint32_t argb);
 
-uint32_t libgl_rgb(uint8_t r, uint8_t g, uint8_t b);
-uint32_t libgl_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
-
-void libgl_clear(LibGL_Context *ctx, uint32_t argb);
-void libgl_put_pixel(LibGL_Context *ctx, int x, int y, uint32_t argb);
-void libgl_blend_pixel(LibGL_Context *ctx, int x, int y, uint32_t argb);
-void libgl_fill_rect(LibGL_Context *ctx, int x, int y, int w, int h, uint32_t argb);
-void libgl_fill_circle(LibGL_Context *ctx, int cx, int cy, int radius, uint32_t argb);
-void libgl_draw_ring(LibGL_Context *ctx, int cx, int cy, int outer_r, int inner_r, uint32_t argb);
-void libgl_fill_rotated_rect(
-    LibGL_Context *ctx,
-    float cx, float cy,
-    float length, float width,
-    float angle_deg,
-    uint32_t argb
+void d2dgl_draw_sprite(
+    D2DGL_Context *ctx,
+    const D2DGL_Sprite *spr,
+    int dstX, int dstY,
+    int dstW, int dstH,
+    uint32_t tint
 );
 
-void libgl_present(LibGL_Context *ctx);
+void d2dgl_draw_sprite_rotated(
+    D2DGL_Context *ctx,
+    const D2DGL_Sprite *spr,
+    float centerX, float centerY,
+    float dstW, float dstH,
+    float angleDeg,
+    uint32_t tint
+);
 
-uint32_t *libgl_get_framebuffer(LibGL_Context *ctx);
-int libgl_get_width(const LibGL_Context *ctx);
-int libgl_get_height(const LibGL_Context *ctx);
+bool d2dgl_key_down(const D2DGL_Context *ctx, int key);
+bool d2dgl_key_pressed(const D2DGL_Context *ctx, int key);
+bool d2dgl_mouse_down(const D2DGL_Context *ctx);
+void d2dgl_mouse_pos(const D2DGL_Context *ctx, int *outX, int *outY);
 
 #endif
